@@ -1,6 +1,6 @@
 os: linux
-dist: xenial
-language: minimal
+dist: bionic
+language: generic
 sudo: required
 git:
   depth: 1
@@ -17,7 +17,7 @@ before_install:
 install: true
 before_script:
   - "travis_wait 20 sleep 1800 &"
-  - mkdir -p $HOME/twrp
+  - mkdir -p $HOME/twrp && cd $HOME/twrp
   - wget -q https://github.com/PhantomZone54/twrp_sources_norepo/releases/download/v3.2.3-20180830/MinimalOmniRecovery-twrp-6.0-norepo-20180830.tar.xz
     -O $HOME/twrp.tar.xz
   - tar -xJf twrp.tar.xz --directory $HOME/twrp/ && rm twrp.tar.xz
