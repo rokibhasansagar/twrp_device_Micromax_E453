@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: fr3akyphantom/droid-builder:latest
-    working_directory: /home/builder
+    working_directory: /home/builder/work
     no_output_timeout: 30m
     steps:
       - checkout
@@ -26,10 +26,10 @@ jobs:
             export version=$(cat bootable/recovery/variables.h | grep "define TW_MAIN_VERSION_STR" | cut -d '"' -f2) && echo "TWRP $version"
             export nowTime=$(date +%Y%m%d-%H%M) && echo $nowTime
             mkdir gh_release
-            tar -I pxz -cf $HOME/twrp/gh_release/E453-$nowTime-build.log.tar.xz build.log
-            cp $HOME/twrp/out/target/product/E453/recovery.img $HOME/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
-            cd $HOME/twrp/out/target/product/E453/system/ && tar -I pxz -cf $HOME/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
-            cd $HOME/twrp/
+            tar -I pxz -cf $HOME/work/twrp/gh_release/E453-$nowTime-build.log.tar.xz build.log
+            cp $HOME/work/twrp/out/target/product/E453/recovery.img $HOME/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
+            cd $HOME/work/twrp/out/target/product/E453/system/ && tar -I pxz -cf $HOME/work/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
+            cd $HOME/work/twrp/
             wput gh_release/TWRP-$version-Primo_RX5-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             wput gh_release/extra-system-files-$nowTime.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             wput gh_release/E453-$nowTime-build.log.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
