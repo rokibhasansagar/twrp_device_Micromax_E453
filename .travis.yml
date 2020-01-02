@@ -16,13 +16,13 @@ before_install:
   - docker pull fr3akyphantom/droid-builder:latest
 install: true
 before_script:
-  - "travis_wait 20 sleep 1800 &"
+  - "travis_wait 40 sleep 1800 &"
   - mkdir -p $HOME/twrp
   - wget -q https://github.com/PhantomZone54/twrp_sources_norepo/releases/download/v3.2.3-20180830/MinimalOmniRecovery-twrp-6.0-norepo-20180830.tar.xz
     -O $HOME/twrp.tar.xz
   - cd $HOME && tar -xJf twrp.tar.xz --directory $HOME/twrp/ && rm twrp.tar.xz
 script:
-  - "travis_wait 20 sleep 1800 &"
+  - "travis_wait 40 sleep 1800 &"
   - cd $HOME/twrp/
   - git clone https://github.com/rokibhasansagar/twrp_device_Micromax_E453 -b master --single-branch device/Micromax/E453
   - rm -rf bootable/recovery && git clone https://github.com/omnirom/android_bootable_recovery -b android-9.0 --depth 1 bootable/recovery
@@ -31,7 +31,7 @@ script:
     cd /home/builder/twrp/
     source build/envsetup.sh
     lunch omni_E453-userdebug
-    mka recoveryimage | tee build.log
+    mka recoveryimage 2&>1 | tee build.log
     exit
     EOF
 after_success:
