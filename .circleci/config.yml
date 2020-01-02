@@ -1,0 +1,36 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: fr3akyphantom/droid-builder:latest
+    working_directory: /home/builder
+    no_output_timeout: 30m
+    steps:
+      - checkout
+      - run:
+          name: AIO Build
+          command: |
+            echo "Set GitAuth Infos too"
+            git config --global user.email $GitHubMail
+            git config --global user.name $GitHubName
+            git config --global color.ui true
+            mkdir twrp
+            wget -q https://github.com/PhantomZone54/twrp_sources_norepo/releases/download/v3.2.3-20180830/MinimalOmniRecovery-twrp-6.0-norepo-20180830.tar.xz -O twrp.tar.xz
+            tar -xJf twrp.tar.xz --directory twrp/ && rm twrp.tar.xz
+            cd twrp/
+            git clone https://github.com/rokibhasansagar/twrp_device_Micromax_E453 -b master --single-branch device/Micromax/E453
+            rm -rf bootable/recovery && git clone https://github.com/omnirom/android_bootable_recovery -b android-9.0 --depth 1 bootable/recovery
+            source build/envsetup.sh
+            lunch omni_E453-userdebug
+            mka recoveryimage | tee build.log
+            export version=$(cat bootable/recovery/variables.h | grep "define TW_MAIN_VERSION_STR" | cut -d '"' -f2) && echo "TWRP $version"
+            export nowTime=$(date +%Y%m%d-%H%M) && echo $nowTime
+            mkdir gh_release
+            tar -I pxz -cf $HOME/twrp/gh_release/E453-$nowTime-build.log.tar.xz build.log
+            cp $HOME/twrp/out/target/product/E453/recovery.img $HOME/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
+            cd $HOME/twrp/out/target/product/E453/system/ && tar -I pxz -cf $HOME/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
+            cd $HOME/twrp/
+            wput gh_release/TWRP-$version-Primo_RX5-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            wput gh_release/extra-system-files-$nowTime.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            wput gh_release/E453-$nowTime-build.log.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            ghr -t ${GitOAUTHToken} -n "Test Release for E453" -b "TWRP $(echo $version)" -c ${CIRCLE_SHA1} -delete $version gh_release/
