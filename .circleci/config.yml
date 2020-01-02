@@ -19,7 +19,13 @@ jobs:
             tar -xJf twrp.tar.xz --directory twrp/ && rm twrp.tar.xz
             cd twrp/
             git clone https://github.com/rokibhasansagar/twrp_device_Micromax_E453 -b master --single-branch device/Micromax/E453
-            echo -en "[\n\n]" > device/Micromax/E453/omni.dependencies
+            # Local manifests hack. Some builds fail if the file path does not exist.
+            mkdir -p .repo/local_manifests && cat <<EOF > .repo/local_manifests/roomservice.xml
+            <?xml version="1.0" encoding="UTF-8"?>
+            <manifest>
+            <!-- dummy -->
+            </manifest>
+            EOF
             rm -rf bootable/recovery && git clone https://github.com/omnirom/android_bootable_recovery -b android-9.0 --depth 1 bootable/recovery
             source build/envsetup.sh
             lunch omni_E453-userdebug
