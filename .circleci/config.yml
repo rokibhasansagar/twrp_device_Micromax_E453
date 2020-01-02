@@ -29,15 +29,16 @@ jobs:
             rm -rf bootable/recovery && git clone https://github.com/omnirom/android_bootable_recovery -b android-9.0 --depth 1 bootable/recovery
             source build/envsetup.sh
             lunch omni_E453-userdebug
-            mka recoveryimage | tee build.log
+            echo "Starting the Build Process"
+            mka recoveryimage | tee $HOME/work/twrp/build.log
             export version=$(cat bootable/recovery/variables.h | grep "define TW_MAIN_VERSION_STR" | cut -d '"' -f2) && echo "TWRP $version"
             export nowTime=$(date +%Y%m%d-%H%M) && echo $nowTime
             mkdir gh_release
-            tar -I pxz -cf $HOME/work/twrp/gh_release/E453-$nowTime-build.log.tar.xz build.log
-            cp $HOME/work/twrp/out/target/product/E453/recovery.img $HOME/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
+            tar -I pxz -cf $HOME/work/twrp/gh_release/E453-$nowTime-buildlog.tar.xz $HOME/work/twrp/build.log
+            cp $HOME/work/twrp/out/target/product/E453/recovery.img $HOME/work/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
             cd $HOME/work/twrp/out/target/product/E453/system/ && tar -I pxz -cf $HOME/work/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
             cd $HOME/work/twrp/
             wput gh_release/TWRP-$version-Primo_RX5-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             wput gh_release/extra-system-files-$nowTime.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
-            wput gh_release/E453-$nowTime-build.log.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            wput gh_release/E453-$nowTime-buildlog.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             ghr -t ${GitOAUTHToken} -n "Test Release for E453" -b "TWRP $(echo $version)" -c ${CIRCLE_SHA1} -delete $version gh_release/
