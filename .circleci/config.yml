@@ -10,6 +10,7 @@ jobs:
       - run:
           name: AIO Build
           command: |
+            echo -en "Current directory is - " && pwd
             echo "Set GitAuth Infos too"
             git config --global user.email $GitHubMail
             git config --global user.name $GitHubName
@@ -30,15 +31,16 @@ jobs:
             source build/envsetup.sh
             lunch omni_E453-userdebug
             echo "Starting the Build Process"
-            mka recoveryimage | tee $HOME/work/twrp/build.log
+            echo -en "Current directory is - " && pwd
+            make -j32 recoveryimage
+            echo -en "Current directory is - " && pwd
             export version=$(cat bootable/recovery/variables.h | grep "define TW_MAIN_VERSION_STR" | cut -d '"' -f2) && echo "TWRP $version"
             export nowTime=$(date +%Y%m%d-%H%M) && echo $nowTime
             mkdir gh_release
-            tar -I pxz -cf $HOME/work/twrp/gh_release/E453-$nowTime-buildlog.tar.xz $HOME/work/twrp/build.log
             cp $HOME/work/twrp/out/target/product/E453/recovery.img $HOME/work/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
             cd $HOME/work/twrp/out/target/product/E453/system/ && tar -I pxz -cf $HOME/work/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
             cd $HOME/work/twrp/
             wput gh_release/TWRP-$version-Primo_RX5-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             wput gh_release/extra-system-files-$nowTime.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
-            wput gh_release/E453-$nowTime-buildlog.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            ls -la gh_release/
             ghr -t ${GitOAUTHToken} -n "Test Release for E453" -b "TWRP $(echo $version)" -c ${CIRCLE_SHA1} -delete $version gh_release/
