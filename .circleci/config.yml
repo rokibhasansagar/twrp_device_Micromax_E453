@@ -40,7 +40,7 @@ jobs:
             cp /home/builder/work/twrp/out/target/product/E453/recovery.img /home/builder/work/twrp/gh_release/TWRP-$version-E453-$nowTime-Unofficial.img
             cd /home/builder/work/twrp/out/target/product/E453/system/ && tar -I pxz -cf /home/builder/work/twrp/gh_release/extra-system-files-$nowTime.tar.xz *
             cd /home/builder/work/twrp/
-            wput gh_release/TWRP-$version-Primo_RX5-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
+            wput gh_release/TWRP-$version-E453-$nowTime-Unofficial.img ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             wput gh_release/extra-system-files-$nowTime.tar.xz ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//TWBuild-$version-$nowTime/
             ls -la gh_release/ && echo "Releasing..."
             ghr -t ${GitOAUTHToken} -n "Test Release for E453" -b "TWRP $(echo $version)" -c ${CIRCLE_SHA1} -delete $version /home/builder/work/twrp/gh_release/
