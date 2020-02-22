@@ -33,7 +33,7 @@ jobs:
             echo "Starting the Build Process"
             echo -en "Current directory is - " && pwd
             make -j32 recoveryimage
-            lscpu --all
+            lscpu --all --extended
             echo -en "Current directory is - " && pwd
             export version=$(cat bootable/recovery/variables.h | grep "define TW_MAIN_VERSION_STR" | cut -d '"' -f2) && echo "TWRP $version"
             export nowTime=$(date +%Y%m%d-%H%M) && echo $nowTime
